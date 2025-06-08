@@ -1,36 +1,33 @@
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local function comprarSementesComuns()
+	local gui = player:WaitForChild("PlayerGui")
+	
+	-- Procurar a interface da loja
+	for _, interface in pairs(gui:GetChildren()) do
+		if interface:IsA("ScreenGui") and interface:FindFirstChildWhichIsA("Frame", true) then
+			-- Procurar pelos itens da loja
+			for _, item in pairs(interface:GetDescendants()) do
+				if item:IsA("TextLabel") and (item.Text == "Carrot Seed" or item.Text == "Strawberry Seed") then
+					local container = item.Parent
 
--- Criar GUI
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "ExplorerGUI"
+					-- Verificar se tem estoque
+					local stock = container:FindFirstChildWhichIsA("TextLabel", true)
+					if stock and stock.Text:find("Stock") then
+						
+						-- Procurar botão com preço em ¢
+						for _, botao in pairs(container:GetDescendants()) do
+							if botao:IsA("TextButton") and botao.Text:match("¢") then
+								print("Comprando:", item.Text)
+								botao:Activate()
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
 
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(0, 300, 0, 50)
-button.Position = UDim2.new(0, 50, 0, 200)
-button.Text = "Detectar Tudo"
-button.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-button.TextScaled = true
-button.Parent = gui
-
--- Explora o jogo inteiro
-button.MouseButton1Click:Connect(function()
-    local sources = {
-        workspace,
-        game.ReplicatedStorage,
-        game:GetService("StarterGui"),
-        game:GetService("Players"),
-        game:GetService("StarterPack"),
-    }
-
-    local found = {}
-
-    for _, container in pairs(sources) do
-        for _, obj in pairs(container:GetChildren()) do
-            table.insert(found, container.Name .. "/" .. obj.Name)
-        end
-    end
-
-    local list = table.concat(found, ", ")
-    print("Detectados:", list)
-    button.Text = found[1] and "Achou: " .. found[1] or "Nada encontrado"
-end)
+-- Chamar a função
+comprarSementesComuns()
