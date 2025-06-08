@@ -7,20 +7,30 @@ gui.Name = "ExplorerGUI"
 local button = Instance.new("TextButton")
 button.Size = UDim2.new(0, 300, 0, 50)
 button.Position = UDim2.new(0, 50, 0, 200)
-button.Text = "Detectar Objetos"
-button.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
+button.Text = "Detectar Tudo"
+button.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
 button.TextScaled = true
 button.Parent = gui
 
--- Quando clicar, lista os objetos
+-- Explora o jogo inteiro
 button.MouseButton1Click:Connect(function()
-    local result = {}
-    for _, obj in pairs(workspace:GetChildren()) do
-        table.insert(result, obj.Name)
+    local sources = {
+        workspace,
+        game.ReplicatedStorage,
+        game:GetService("StarterGui"),
+        game:GetService("Players"),
+        game:GetService("StarterPack"),
+    }
+
+    local found = {}
+
+    for _, container in pairs(sources) do
+        for _, obj in pairs(container:GetChildren()) do
+            table.insert(found, container.Name .. "/" .. obj.Name)
+        end
     end
 
-    -- Mostrar primeiros nomes no botão
-    local list = table.concat(result, ", ")
-    print("Objetos no workspace:", list)
-    button.Text = result[1] and "Achou: " .. result[1] or "Nada encontrado"
+    local list = table.concat(found, ", ")
+    print("Detectados:", list)
+    button.Text = found[1] and "Achou: " .. found[1] or "Nada encontrado"
 end)
